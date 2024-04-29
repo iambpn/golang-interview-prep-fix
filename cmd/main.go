@@ -47,13 +47,13 @@ func run(serve_addr, dbURL, dbType, migrationPath string) error {
 
 	http.HandleFunc("/user", h.AddUser)
 
+	log.Printf("starting http server on %s", serve_addr)
 	err = http.ListenAndServe(serve_addr, nil)
 
 	if err != nil {
 		return fmt.Errorf("listen_on_addr: %w", err)
 	}
 
-	fmt.Printf("starting http server on %s", serve_addr)
 	return nil
 }
 
