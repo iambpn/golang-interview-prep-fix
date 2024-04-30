@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -18,6 +19,7 @@ func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	var u User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
+		log.Print(err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Invalid request body"))
 		return
@@ -25,8 +27,10 @@ func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	// Call the AddUser function
 	message, err := h.Svc.AddUser(u)
 	if err != nil {
+		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Failed to add user"))
+		return
 	}
 
 	// Return a success response

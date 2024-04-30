@@ -20,28 +20,33 @@ import (
 
 func main() {
 	dbURL := os.Getenv("db_uri")
-	dbType := os.Getenv("db_type")
+	dbDriver := os.Getenv("db_driver")
 	migrationPath := os.Getenv("migration_path")
 	server_addr := os.Getenv("app_addr")
 
-	err := run(server_addr, dbURL, dbType, migrationPath)
+	err := run(server_addr, dbURL, dbDriver, migrationPath)
 
 	if err != nil {
 		log.Fatal(fmt.Errorf("main: run: %w", err))
 	}
 }
 
-func run(serve_addr, dbURL, dbType, migrationPath string) error {
-	err := runMigrations(dbURL, dbType, migrationPath)
+func run(serve_addr, dbURL, dbDriver, migrationPath string) error {
+	db, err := dbInstance(dbURL, dbDriver)
+
+	if err != nil {
+		return fmt.Errorf("get_db_instance: %w", err)
+	}
+
+	defer db.Close()
+
+	err = runMigrations(db, migrationPath)
 
 	if err != nil {
 		return fmt.Errorf("run_migration: %w", err)
 	}
 
-	svc, err := user.NewService("admin", "admin")
-	if err != nil {
-		return fmt.Errorf("initialize_user_service: %w", err)
-	}
+	svc := user.NewService(db)
 
 	h := user.Handler{Svc: *svc}
 
@@ -57,20 +62,23 @@ func run(serve_addr, dbURL, dbType, migrationPath string) error {
 	return nil
 }
 
-func runMigrations(dbURL, dbType, migrationPath string) error {
-	db, err := sql.Open(dbType, dbURL)
+func dbInstance(dbURI, dbDriver string) (*sql.DB, error) {
+	db, err := sql.Open(dbDriver, dbURI)
 	if err != nil {
-		return fmt.Errorf("connect_to_db: %w", err)
+		return nil, fmt.Errorf("db_instance: %w", err)
 	}
-	defer db.Close()
+	return db, nil
+}
 
+func runMigrations(db *sql.DB, migrationPath string) error {
 	// Create a new instance of the PostgreSQL driver for migrate
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("get_instance: %w", err)
 	}
 
-	m, err := migrate.NewWithDatabaseInstance(fmt.Sprintf("file://%s", migrationPath), dbType, driver)
+	migrationFilePath := fmt.Sprintf("file://%s", migrationPath)
+	m, err := migrate.NewWithDatabaseInstance(migrationFilePath, "", driver)
 	if err != nil {
 		return fmt.Errorf("create_migration_instance: %w", err)
 	}
