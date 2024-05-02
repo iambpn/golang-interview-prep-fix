@@ -2,14 +2,11 @@
 
 ## Goal of this repo.
 
-This repo contains Golang code that does not follow best practises, contains bugs and security issues. It is intended to
-be used as an interview exercise or a practise exercise for jr/mid-level Go engineers.
+This repo contains Golang code that does not follow best practises, contains bugs and security issues. It is intended to be used as an interview exercise or a practise exercise for jr/mid-level Go engineers.
 
-This repo contains, technically, a functional golang application that receives a request to create a user and stores it
-into a postgres Database.
+This repo contains, technically, a functional golang application that receives a request to create a user and stores it into a postgres Database.
 
-As an exercise, you could try identifying and correcting some of the issues in this repo. This would work particularly
-well as a pair programming exercise.
+As an exercise, you could try identifying and correcting some of the issues in this repo. This would work particularly well as a pair programming exercise.
 
 ## Getting Started
 
@@ -22,4 +19,9 @@ Once running the Go app, you can make a CURL request as follows:
 ```
 
 ## Solutions
+
 you can find the solutions [here](./solutions.md)
+
+## Adding Bcrypt
+
+- command: `go get golang.org/x/crypto/bcrypt` and use its one function without intellisense then run `go mod tidy` & `go mod vendor` (optional)
