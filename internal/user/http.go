@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Handler struct {
@@ -24,6 +26,19 @@ func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Invalid request body"))
 		return
 	}
+
+	// hash password
+	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Internal server error"))
+		return
+	}
+
+	u.Password = string(hash)
+
 	// Call the AddUser function
 	message, err := h.Svc.AddUser(u)
 	if err != nil {
