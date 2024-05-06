@@ -8,4 +8,4 @@
 - [ ] Currently, usernames don't have a NULL constraint. This could be problematic, depending on your business requirements.
 - [x] The error handling could be much better. Sometimes we return the error, sometimes we panic.
 - [ ] There's no test coverage at all.
-- [ ] There's no authentication at all. Anybody can add a user.
+- [x] There's no authentication at all. Anybody can add a user.

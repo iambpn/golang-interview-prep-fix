@@ -15,6 +15,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/matthewjamesboyle/golang-interview-prep/internal/middlewares"
 	"github.com/matthewjamesboyle/golang-interview-prep/internal/user"
 )
 
@@ -48,9 +49,9 @@ func run(serve_addr, dbURL, dbDriver, migrationPath string) error {
 
 	svc := user.NewService(db)
 
-	h := user.Handler{Svc: *svc}
+	userHandler := user.Handler{Svc: *svc}
 
-	http.HandleFunc("/user", h.AddUser)
+	http.HandleFunc("/user", middlewares.AuthRequired(userHandler.AddUser))
 
 	log.Printf("starting http server on %s", serve_addr)
 	err = http.ListenAndServe(serve_addr, nil)
